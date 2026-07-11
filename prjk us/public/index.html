@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FutsalBook - Aplikasi reservasi lapangan futsal secara real-time dan mudah.">
+  <title>FutsalBook — Sistem Reservasi Lapangan Futsal</title>
+  
+  <!-- Google Fonts & Icon Packs -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Custom Premium CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+    <div id="appToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">
+          Notifikasi FutsalBook
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center" style="background: rgba(15,23,42,0.8); z-index: 2000;">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- ==================== AUTH CONTAINER ==================== -->
+  <div id="authContainer" class="auth-container">
+    
+    <!-- 1. Halaman Login -->
+    <div id="view-login" class="view-section auth-card glass-card">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-futbol text-primary me-2"></i>FutsalBook</h2>
+        <p class="text-light">Masuk untuk memesan lapangan futsal Anda</p>
+      </div>
+      <form id="form-login">
+        <div class="mb-3">
+          <label for="login-email" class="form-label form-label-custom">Email</label>
+          <input type="email" id="login-email" class="form-control form-control-custom" placeholder="contoh@email.com" required>
+        </div>
+        <div class="mb-3">
+          <label for="login-password" class="form-label form-label-custom">Password</label>
+          <input type="password" id="login-password" class="form-control form-control-custom" placeholder="******" required>
+        </div>
+        <div class="text-end mb-3">
+          <a href="#/forgot-password" class="text-decoration-none text-primary small">Lupa Password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 btn-animate fw-semibold">Login <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i></button>
+      </form>
+      <div class="text-center mt-4">
+        <span class="text-light small opacity-75">Belum punya akun? <a href="#/register" class="text-decoration-none text-primary fw-semibold">Daftar Sekarang</a></span>
+      </div>
+    </div>
+
+    <!-- 2. Halaman Register -->
+    <div id="view-register" class="view-section auth-card glass-card">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-futbol text-primary me-2"></i>FutsalBook</h2>
+        <p class="text-light">Buat akun penyewa baru</p>
+      </div>
+      <form id="form-register">
+        <div class="mb-3">
+          <label for="register-nama" class="form-label form-label-custom">Nama Lengkap</label>
+          <input type="text" id="register-nama" class="form-control form-control-custom" placeholder="Andi Wijaya" required>
+        </div>
+        <div class="mb-3">
+          <label for="register-email" class="form-label form-label-custom">Email</label>
+          <input type="email" id="register-email" class="form-control form-control-custom" placeholder="andi@email.com" required>
+        </div>
+        <div class="mb-3">
+          <label for="register-hp" class="form-label form-label-custom">Nomor HP / WhatsApp</label>
+          <input type="tel" id="register-hp" class="form-control form-control-custom" placeholder="0812xxxxxxxx" required>
+        </div>
+        <div class="mb-3">
+          <label for="register-password" class="form-label form-label-custom">Password (Minimal 6 karakter)</label>
+          <input type="password" id="register-password" class="form-control form-control-custom" placeholder="******" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 btn-animate fw-semibold">Daftar Akun <i class="fa-solid fa-user-plus ms-1"></i></button>
+      </form>
+      <div class="text-center mt-4">
+        <span class="text-light small opacity-75">Sudah punya akun? <a href="#/login" class="text-decoration-none text-primary fw-semibold">Login</a></span>
+      </div>
+    </div>
+
+    <!-- 3. Halaman Lupa Password -->
+    <div id="view-forgot-password" class="view-section auth-card glass-card">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold">Lupa Password</h3>
+        <p class="text-light">Masukkan email Anda untuk menerima tautan/kode reset password</p>
+      </div>
+      <form id="form-forgot-password">
+        <div class="mb-4">
+          <label for="forgot-email" class="form-label form-label-custom">Email Terdaftar</label>
+          <input type="email" id="forgot-email" class="form-control form-control-custom" placeholder="contoh@email.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 btn-animate fw-semibold">Kirim Permintaan <i class="fa-solid fa-paper-plane ms-1"></i></button>
+      </form>
+      <div class="text-center mt-4">
+        <span class="text-muted small"><a href="#/login" class="text-decoration-none text-primary"><i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Login</a></span>
+      </div>
+    </div>
+
+    <!-- 4. Halaman Reset Password -->
+    <div id="view-reset-password" class="view-section auth-card glass-card">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold">Reset Password</h3>
+        <p class="text-light">Masukkan password baru Anda untuk memulihkan akun</p>
+      </div>
+      <form id="form-reset-password">
+        <input type="hidden" id="reset-token-input">
+        <div class="mb-4">
+          <label for="reset-new-password" class="form-label form-label-custom">Password Baru (Min. 6 Karakter)</label>
+          <input type="password" id="reset-new-password" class="form-control form-control-custom" placeholder="******" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 btn-animate fw-semibold">Ubah Password <i class="fa-solid fa-check ms-1"></i></button>
+      </form>
+    </div>
+
+  </div>
+  <!-- ==================== END AUTH CONTAINER ==================== -->
+
+
+  <!-- ==================== MAIN APP LAYOUT ==================== -->
+  <div id="appLayout" class="app-layout d-none">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="p-4 d-flex align-items-center justify-content-between border-bottom border-secondary border-opacity-10">
+        <h4 class="mb-0 fw-bold"><i class="fa-solid fa-futbol text-primary me-2"></i>FutsalBook</h4>
+        <button class="btn btn-dark d-lg-none py-1 px-2 border-0" onclick="toggleMobileSidebar()"><i class="fa-solid fa-bars"></i></button>
+      </div>
+      
+      <!-- User Info Box -->
+      <div class="px-4 py-3 d-flex align-items-center">
+        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold me-3" style="width: 40px; height: 40px;" id="sidebar-avatar">
+          U
+        </div>
+        <div>
+          <h6 class="mb-0 fw-semibold text-white text-truncate" style="max-width: 150px;" id="sidebar-username">Nama User</h6>
+          <span class="badge bg-secondary text-capitalize small" style="font-size: 0.7rem;" id="sidebar-role">Role</span>
+        </div>
+      </div>
+
+      <!-- Navigation links dynamically changed depending on user role -->
+      <nav class="flex-grow-1 mt-3" id="sidebar-nav">
+        <!-- JS will render menu links here -->
+      </nav>
+
+      <!-- Logout -->
+      <div class="p-3 border-top border-secondary border-opacity-10">
+        <button class="btn btn-outline-danger w-100 py-2 fw-semibold" onclick="handleLogout()">
+          <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <main class="main-content">
+      
+      <!-- Top Mobile Navigation Bar -->
+      <header class="d-lg-none d-flex align-items-center justify-content-between mb-4 glass-card p-3">
+        <h4 class="mb-0 fw-bold"><i class="fa-solid fa-futbol text-primary me-2"></i>FutsalBook</h4>
+        <button class="btn btn-primary" onclick="toggleMobileSidebar()"><i class="fa-solid fa-bars"></i></button>
+      </header>
+
+      <!-- ==================== PAGES CONTAINER ==================== -->
+      <div id="pagesContainer">
+
+        <!-- 5. Halaman Dashboard User -->
+        <div id="view-user-dashboard" class="view-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="fw-bold mb-1" id="dash-greeting">Halo, Selamat Datang!</h2>
+              <p class="text-muted mb-0">Berikut adalah ringkasan aktivitas reservasi lapangan futsal Anda</p>
+            </div>
+            <a href="#/fields" class="btn btn-primary px-4 py-2 btn-animate fw-semibold"><i class="fa-solid fa-plus me-1"></i> Booking Lapangan</a>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <!-- Stat 1 -->
+            <div class="col-md-6 col-lg-4">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Booking Aktif</span>
+                  <h3 class="fw-bold mb-0" id="dash-active-count">0</h3>
+                </div>
+                <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+            </div>
+            <!-- Stat 2 -->
+            <div class="col-md-6 col-lg-8">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Jadwal Main Terdekat</span>
+                  <h5 class="fw-bold mb-0 text-white" id="dash-next-field">Tidak ada jadwal terdekat</h5>
+                  <span class="text-muted small" id="dash-next-time">-</span>
+                </div>
+                <div class="stat-icon stat-icon-green"><i class="fa-regular fa-calendar-days"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Bookings Table -->
+          <div class="glass-card p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>5 Booking Terakhir</h5>
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Lapangan</th>
+                    <th>Tanggal Main</th>
+                    <th>Jam</th>
+                    <th>Total Biaya</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-bookings-list">
+                  <!-- JS dynamically renders rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Daftar Lapangan (User & Public) -->
+        <div id="view-user-fields" class="view-section">
+          <h2 class="fw-bold mb-1">Daftar Lapangan Futsal</h2>
+          <p class="text-muted mb-4">Cari lapangan berkualitas dan tentukan jadwal bermain Anda</p>
+
+          <!-- Search and Filter Panel -->
+          <div class="glass-card p-4 mb-4">
+            <form id="form-filter-fields" class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label for="filter-search" class="form-label form-label-custom">Cari Nama Lapangan</label>
+                <input type="text" id="filter-search" class="form-control form-control-custom" placeholder="Sintetis, parquet...">
+              </div>
+              <div class="col-md-3">
+                <label for="filter-lokasi" class="form-label form-label-custom">Lokasi</label>
+                <input type="text" id="filter-lokasi" class="form-control form-control-custom" placeholder="Jakarta, Bandung...">
+              </div>
+              <div class="col-md-3">
+                <label for="filter-harga" class="form-label form-label-custom">Harga Maksimum per Jam</label>
+                <input type="number" id="filter-harga" class="form-control form-control-custom" placeholder="150000">
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 py-2 btn-animate fw-semibold"><i class="fa-solid fa-magnifying-glass me-1"></i> Filter</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Fields Grid -->
+          <div class="row g-4" id="fields-grid-list">
+            <!-- Dynamic elements generated by JS -->
+          </div>
+        </div>
+
+        <!-- 7. Detail Lapangan -->
+        <div id="view-user-field-detail" class="view-section">
+          <a href="#/fields" class="btn btn-outline-light mb-4 py-2"><i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Daftar Lapangan</a>
+          
+          <div class="row g-4">
+            <!-- Left Side: Image and Basic Details -->
+            <div class="col-lg-6">
+              <div class="glass-card p-3">
+                <img src="" id="field-detail-img" class="img-fluid rounded-4 w-100 object-fit-cover" style="max-height: 400px;" alt="Foto Lapangan">
+              </div>
+            </div>
+            
+            <!-- Right Side: Facilities & Booking Button -->
+            <div class="col-lg-6">
+              <div class="glass-card p-4 h-100 d-flex flex-column">
+                <div class="mb-3">
+                  <span class="badge bg-success mb-2" id="field-detail-status">Tersedia</span>
+                  <h2 class="fw-bold mb-1" id="field-detail-name">Nama Lapangan</h2>
+                  <p class="text-primary fw-semibold mb-0" id="field-detail-location"><i class="fa-solid fa-location-dot me-2"></i> Lokasi Lapangan</p>
+                </div>
+                
+                <h4 class="fw-bold text-info mb-3" id="field-detail-price">Rp 0 / Jam</h4>
+                
+                <div class="mb-3">
+                  <h6 class="fw-bold text-white">Deskripsi:</h6>
+                  <p class="text-muted" id="field-detail-description">Deskripsi lapangan lengkap...</p>
+                </div>
+
+                <div class="mb-4">
+                  <h6 class="fw-bold text-white">Fasilitas Lapangan:</h6>
+                  <div class="d-flex flex-wrap gap-2 mt-2" id="field-detail-facilities">
+                    <!-- Dynamic badges -->
+                  </div>
+                </div>
+
+                <div class="mt-auto">
+                  <a href="" id="field-detail-booking-btn" class="btn btn-primary w-100 py-3 btn-animate fw-bold"><i class="fa-solid fa-calendar-check me-2"></i> Pesan Sekarang</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Halaman Form Booking -->
+        <div id="view-user-booking-form" class="view-section">
+          <h2 class="fw-bold mb-1">Pengajuan Reservasi Lapangan</h2>
+          <p class="text-muted mb-4">Lengkapi form reservasi di bawah untuk mendaftarkan jadwal main Anda</p>
+          
+          <div class="row g-4">
+            <!-- Booking Form -->
+            <div class="col-lg-7">
+              <div class="glass-card p-4">
+                <form id="form-create-booking">
+                  <input type="hidden" id="booking-field-id">
+                  
+                  <div class="mb-3">
+                    <label for="booking-tanggal" class="form-label form-label-custom">Tanggal Bermain</label>
+                    <input type="date" id="booking-tanggal" class="form-control form-control-custom" required>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="booking-jam" class="form-label form-label-custom">Jam Mulai</label>
+                      <input type="time" id="booking-jam" class="form-control form-control-custom" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="booking-durasi" class="form-label form-label-custom">Durasi Bermain (Jam)</label>
+                      <input type="number" id="booking-durasi" class="form-control form-control-custom" min="1" max="12" value="1" required>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label for="booking-catatan" class="form-label form-label-custom">Catatan Khusus (Opsional)</label>
+                    <textarea id="booking-catatan" class="form-control form-control-custom" rows="3" placeholder="Butuh sewa rompi, sepatu tambahan, dsb."></textarea>
+                  </div>
+                  
+                  <div class="p-3 bg-dark rounded-3 mb-4 border border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="text-muted small d-block">Estimasi Biaya</span>
+                      <strong class="text-white h5 mb-0" id="booking-calc-price">Rp 0</strong>
+                    </div>
+                    <span class="text-muted small text-end">Pembayaran cash/transfer di lapangan</span>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary w-100 py-3 btn-animate fw-bold"><i class="fa-solid fa-circle-check me-2"></i> Konfirmasi Booking</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Field Summary Card -->
+            <div class="col-lg-5">
+              <div class="glass-card p-4">
+                <h5 class="fw-bold mb-3 text-white">Lapangan yang Dipesan</h5>
+                <img src="" id="booking-field-img" class="img-fluid rounded-3 mb-3 object-fit-cover w-100" style="height: 180px;" alt="Foto Lapangan">
+                <h5 class="fw-bold mb-1" id="booking-field-name">Nama Lapangan</h5>
+                <p class="text-muted small mb-2" id="booking-field-location"><i class="fa-solid fa-location-dot me-1"></i> Lokasi</p>
+                <div class="d-flex justify-content-between border-top border-secondary border-opacity-10 pt-2">
+                  <span class="text-muted">Tarif Sewa</span>
+                  <span class="text-white fw-semibold" id="booking-field-price">Rp 0 / jam</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. Riwayat Booking User -->
+        <div id="view-user-bookings" class="view-section">
+          <h2 class="fw-bold mb-1">Riwayat Reservasi</h2>
+          <p class="text-muted mb-4">Pantau status persetujuan booking Anda secara real-time</p>
+          
+          <div class="glass-card p-4">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Lapangan</th>
+                    <th>Tanggal Main</th>
+                    <th>Jam Main</th>
+                    <th>Total Harga</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="user-bookings-list">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Profil User / Admin -->
+        <div id="view-user-profile" class="view-section">
+          <h2 class="fw-bold mb-1">Manajemen Profil</h2>
+          <p class="text-muted mb-4">Perbarui informasi kontak dan kata sandi akun Anda</p>
+          
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="glass-card p-4">
+                <form id="form-update-profile">
+                  <div class="mb-3">
+                    <label class="form-label form-label-custom">Email (Tidak dapat diubah)</label>
+                    <input type="email" id="profile-email" class="form-control form-control-custom" disabled>
+                  </div>
+                  <div class="mb-3">
+                    <label for="profile-nama" class="form-label form-label-custom">Nama Lengkap</label>
+                    <input type="text" id="profile-nama" class="form-control form-control-custom" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="profile-hp" class="form-label form-label-custom">Nomor HP</label>
+                    <input type="tel" id="profile-hp" class="form-control form-control-custom" required>
+                  </div>
+                  <hr class="my-4 border-secondary border-opacity-20">
+                  <h5 class="fw-bold text-white mb-3">Ubah Password (Isi hanya jika ingin mengubah)</h5>
+                  <div class="mb-4">
+                    <label for="profile-password" class="form-label form-label-custom">Password Baru (Min. 6 Karakter)</label>
+                    <input type="password" id="profile-password" class="form-control form-control-custom" placeholder="Biarkan kosong jika tidak ingin diubah">
+                  </div>
+                  <button type="submit" class="btn btn-primary px-4 py-2 btn-animate fw-semibold"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Perubahan</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11. Dashboard Admin -->
+        <div id="view-admin-dashboard" class="view-section">
+          <h2 class="fw-bold mb-1">Dashboard Admin</h2>
+          <p class="text-muted mb-4">Ringkasan operasional bisnis lapangan futsal hari ini</p>
+          
+          <div class="row g-4 mb-4">
+            <!-- Stat 1 -->
+            <div class="col-md-6 col-lg-3">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Total Penyewa</span>
+                  <h3 class="fw-bold mb-0" id="admin-dash-users">0</h3>
+                </div>
+                <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-users"></i></div>
+              </div>
+            </div>
+            <!-- Stat 2 -->
+            <div class="col-md-6 col-lg-3">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Total Lapangan</span>
+                  <h3 class="fw-bold mb-0" id="admin-dash-fields">0</h3>
+                </div>
+                <div class="stat-icon stat-icon-green"><i class="fa-solid fa-layer-group"></i></div>
+              </div>
+            </div>
+            <!-- Stat 3 -->
+            <div class="col-md-6 col-lg-3">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Total Booking</span>
+                  <h3 class="fw-bold mb-0" id="admin-dash-bookings">0</h3>
+                </div>
+                <div class="stat-icon stat-icon-yellow"><i class="fa-solid fa-book"></i></div>
+              </div>
+            </div>
+            <!-- Stat 4 -->
+            <div class="col-md-6 col-lg-3">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Pending Approval</span>
+                  <h3 class="fw-bold mb-0" id="admin-dash-pending">0</h3>
+                </div>
+                <div class="stat-icon stat-icon-red"><i class="fa-solid fa-hourglass-half"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+              <div class="glass-card p-4 h-100">
+                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-bolt text-warning me-2"></i>Aksi Cepat</h5>
+                <div class="d-grid gap-2">
+                  <a href="#/admin/fields/new" class="btn btn-outline-primary text-start py-3"><i class="fa-solid fa-plus-circle me-2"></i> Tambah Lapangan Baru</a>
+                  <a href="#/admin/bookings" class="btn btn-outline-warning text-start py-3"><i class="fa-solid fa-clipboard-check me-2"></i> Verifikasi Booking Masuk</a>
+                  <a href="#/admin/reports" class="btn btn-outline-success text-start py-3"><i class="fa-solid fa-chart-line me-2"></i> Lihat Laporan Operasional</a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-6">
+              <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <h5 class="fw-bold text-white mb-2"><i class="fa-solid fa-calendar-day text-success me-2"></i>Booking Hari Ini</h5>
+                  <p class="text-muted mb-0">Total jadwal pertandingan terjadwal hari ini</p>
+                </div>
+                <h1 class="display-3 fw-bold text-primary my-3" id="admin-dash-today">0</h1>
+                <a href="#/admin/bookings" class="text-decoration-none text-primary fw-semibold">Kelola Semua Jadwal <i class="fa-solid fa-arrow-right ms-1"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12. Daftar Lapangan (Admin) -->
+        <div id="view-admin-fields" class="view-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 class="fw-bold mb-1">Kelola Lapangan</h2>
+              <p class="text-muted mb-0">Daftarkan lapangan baru atau sunting rincian fasilitas yang ada</p>
+            </div>
+            <a href="#/admin/fields/new" class="btn btn-primary py-2 px-4 btn-animate fw-semibold"><i class="fa-solid fa-plus me-1"></i> Tambah Lapangan</a>
+          </div>
+
+          <div class="glass-card p-4">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Foto</th>
+                    <th>Nama Lapangan</th>
+                    <th>Lokasi</th>
+                    <th>Harga / Jam</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-fields-list">
+                  <!-- Dynamic admin rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 13. Tambah Lapangan Baru (Admin) -->
+        <div id="view-admin-field-new" class="view-section">
+          <a href="#/admin/fields" class="btn btn-outline-light mb-4 py-2"><i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Kelola Lapangan</a>
+          <h2 class="fw-bold mb-1">Tambah Lapangan Baru</h2>
+          <p class="text-muted mb-4">Masukkan data lapangan futsal baru ke sistem</p>
+
+          <div class="glass-card p-4 max-width-700">
+            <form id="form-create-field">
+              <div class="mb-3">
+                <label for="new-field-name" class="form-label form-label-custom">Nama Lapangan</label>
+                <input type="text" id="new-field-name" class="form-control form-control-custom" placeholder="Contoh: Lapangan A (Sintetis)" required>
+              </div>
+              <div class="mb-3">
+                <label for="new-field-location" class="form-label form-label-custom">Lokasi</label>
+                <input type="text" id="new-field-location" class="form-control form-control-custom" placeholder="Contoh: Lantai 2, Sektor Barat" required>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="new-field-price" class="form-label form-label-custom">Harga Sewa Per Jam (Rp)</label>
+                  <input type="number" id="new-field-price" class="form-control form-control-custom" placeholder="150000" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="new-field-status" class="form-label form-label-custom">Status Ketersediaan</label>
+                  <select id="new-field-status" class="form-select form-control-custom">
+                    <option value="tersedia">Tersedia</option>
+                    <option value="tidak_tersedia">Tidak Tersedia</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="new-field-facilities" class="form-label form-label-custom">Fasilitas (Pisahkan dengan koma)</label>
+                <input type="text" id="new-field-facilities" class="form-control form-control-custom" placeholder="Sintetis, Shower, WiFi" required>
+              </div>
+              <div class="mb-3">
+                <label for="new-field-description" class="form-label form-label-custom">Deskripsi Lapangan</label>
+                <textarea id="new-field-description" class="form-control form-control-custom" rows="3" placeholder="Informasi detail lapangan..." required></textarea>
+              </div>
+              <div class="mb-4">
+                <label for="new-field-foto" class="form-label form-label-custom">URL/Path Foto Lapangan</label>
+                <input type="text" id="new-field-foto" class="form-control form-control-custom" placeholder="https://images.unsplash.com/...">
+              </div>
+              <button type="submit" class="btn btn-primary px-4 py-2 btn-animate fw-semibold"><i class="fa-solid fa-plus-circle me-1"></i> Tambah Lapangan</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 14. Edit Lapangan (Admin) -->
+        <div id="view-admin-field-edit" class="view-section">
+          <a href="#/admin/fields" class="btn btn-outline-light mb-4 py-2"><i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Kelola Lapangan</a>
+          <h2 class="fw-bold mb-1">Edit Lapangan</h2>
+          <p class="text-muted mb-4">Perbarui informasi lapangan futsal</p>
+
+          <div class="glass-card p-4 max-width-700">
+            <form id="form-edit-field">
+              <input type="hidden" id="edit-field-id">
+              <div class="mb-3">
+                <label for="edit-field-name" class="form-label form-label-custom">Nama Lapangan</label>
+                <input type="text" id="edit-field-name" class="form-control form-control-custom" required>
+              </div>
+              <div class="mb-3">
+                <label for="edit-field-location" class="form-label form-label-custom">Lokasi</label>
+                <input type="text" id="edit-field-location" class="form-control form-control-custom" required>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="edit-field-price" class="form-label form-label-custom">Harga Sewa Per Jam (Rp)</label>
+                  <input type="number" id="edit-field-price" class="form-control form-control-custom" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-field-status" class="form-label form-label-custom">Status Ketersediaan</label>
+                  <select id="edit-field-status" class="form-select form-control-custom">
+                    <option value="tersedia">Tersedia</option>
+                    <option value="tidak_tersedia">Tidak Tersedia</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="edit-field-facilities" class="form-label form-label-custom">Fasilitas (Pisahkan dengan koma)</label>
+                <input type="text" id="edit-field-facilities" class="form-control form-control-custom" required>
+              </div>
+              <div class="mb-3">
+                <label for="edit-field-description" class="form-label form-label-custom">Deskripsi Lapangan</label>
+                <textarea id="edit-field-description" class="form-control form-control-custom" rows="3" required></textarea>
+              </div>
+              <div class="mb-4">
+                <label for="edit-field-foto" class="form-label form-label-custom">URL/Path Foto Lapangan</label>
+                <input type="text" id="edit-field-foto" class="form-control form-control-custom">
+              </div>
+              <button type="submit" class="btn btn-primary px-4 py-2 btn-animate fw-semibold"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 16. Kelola Booking (Admin) -->
+        <div id="view-admin-bookings" class="view-section">
+          <h2 class="fw-bold mb-1">Daftar Pengajuan Reservasi</h2>
+          <p class="text-muted mb-4">Verifikasi data reservasi masuk, setujui jadwal, atau selesaikan reservasi pasca main</p>
+          
+          <div class="glass-card p-4">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Penyewa</th>
+                    <th>Lapangan</th>
+                    <th>Tanggal & Waktu</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Catatan</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-bookings-list">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 17. Kelola User (Admin) -->
+        <div id="view-admin-users" class="view-section">
+          <h2 class="fw-bold mb-1">Kelola Pengguna</h2>
+          <p class="text-muted mb-4">Pantau aktivitas pengguna terdaftar dan nonaktifkan akun pelanggar kebijakan</p>
+          
+          <div class="glass-card p-4">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>No. HP</th>
+                    <th>Peran</th>
+                    <th>Status Akun</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-list">
+                  <!-- Dynamic user list -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 18. Laporan Booking & Statistik (Admin) -->
+        <div id="view-admin-reports" class="view-section">
+          <h2 class="fw-bold mb-1">Laporan Operasional</h2>
+          <p class="text-muted mb-4">Pantau performa bisnis lapangan futsal Anda</p>
+          
+          <div class="row g-4 mb-4">
+            <!-- Stat 1: Pendapatan -->
+            <div class="col-md-6">
+              <div class="glass-card stat-box">
+                <div>
+                  <span class="text-muted small d-block mb-1">Total Pendapatan (Approved / Finished)</span>
+                  <h2 class="fw-bold mb-0 text-success" id="report-total-revenue">Rp 0</h2>
+                </div>
+                <div class="stat-icon stat-icon-green"><i class="fa-solid fa-wallet"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <!-- Monthly Bar Chart -->
+            <div class="col-lg-7">
+              <div class="glass-card p-4">
+                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-chart-simple text-primary me-2"></i>Frekuensi Booking Per Bulan</h5>
+                <div class="report-chart-container" id="report-monthly-chart-bars">
+                  <!-- Dynamic bars -->
+                </div>
+                <div style="height: 30px;"></div> <!-- Spacing for labels -->
+              </div>
+            </div>
+
+            <!-- Popular Fields Ranking -->
+            <div class="col-lg-5">
+              <div class="glass-card p-4">
+                <h5 class="fw-bold mb-3 text-white"><i class="fa-solid fa-fire text-danger me-2"></i>Lapangan Terpopuler</h5>
+                <ol class="list-group list-group-flush" id="report-popular-fields-list">
+                  <!-- Dynamic ranking -->
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- ==================== END PAGES CONTAINER ==================== -->
+
+    </main>
+  </div>
+  <!-- ==================== END MAIN APP LAYOUT ==================== -->
+
+  
+  <!-- ==================== BOOKING DETAIL MODAL ==================== -->
+  <div class="modal fade" id="bookingDetailModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(5px);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border border-secondary border-opacity-20" style="border-radius: 16px;">
+        <div class="modal-header border-bottom border-secondary border-opacity-10">
+          <h5 class="modal-title fw-bold" id="bookingDetailTitle">Detail Reservasi</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="bookingDetailContent">
+          <!-- Dynamic details -->
+        </div>
+        <div class="modal-footer border-top border-secondary border-opacity-10">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap 5 JS Bundle (with Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Router SPA & App Script logic -->
+  <script src="/js/router.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
